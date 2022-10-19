@@ -1,14 +1,26 @@
-//#include "gtk_auto.h"
+#include "gtk_auto.h"
 #include <gtk/gtk.h>
 
 // funtion construct
 static void activate (GtkApplication *app, gpointer user_data) {
 
-    GtkWidget *window, *fixed;
-    GtkWidget *button, *button_box;
-    GtkWidget *image;
-    
-    fixed = gtk_fixed_new();
+    GtkWidget *window, *mainBox;
+    GtkWidget *buttboxConvert, *buttboxHam, *buttBoxError, * buttBoxSuma;
+    GtkWidget *buttonConvert, *buttonHam, *buttonError, *buttonSuma;
+
+    // Create box for buttons
+    buttBoxConvert = gtk_button_box_new();
+    buttBoxHam = gtk_button_box_new();
+    buttBoxError = gtk_button_box_new();
+    buttBoxSuma = gtk_button_box_new();
+
+    // Create buttons and add at button box
+    buttonConvert = gtk_button_new_with_label("Binario - Gray");
+    buttonSuma = gtk_button_new_with_label("Sumar formato Gray");
+    buttonHam = gtk_button_new_with_label("Código Hamming");
+    buttonError = gtk_button_new_with_label("Deteccion y correcion de errores");
+
+    mainBox = gtk_box_new();
         
     // Set properties for winow
     window = gtk_application_window_new (app);
