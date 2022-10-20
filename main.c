@@ -9,10 +9,6 @@ static void activate (GtkApplication *app, gpointer user_data) {
     GtkWidget *buttonConvert, *buttonHam, *buttonError, *buttonSuma;
     GtkStyleContext *style;
 
-GtkWindow GtkButton->background-color = #898989;
-    // Set Style for buttons
-    style_set(buttonConvert, style);
-
     // Create mian container box 
     mainBox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 20);
 
@@ -51,7 +47,11 @@ GtkWindow GtkButton->background-color = #898989;
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
     gtk_window_set_title (GTK_WINDOW (window), "Window");
     gtk_window_set_default_size (GTK_WINDOW (window), 800, 600);
-    gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
+    gtk_window_set_resizable(GTK_WINDOW(window), TRUE);
+    
+    style; "labels" = "widgets" {
+    font_name = "Sans Bold 14"
+    }
 
     
     gtk_container_add(GTK_CONTAINER(window), mainBox);
