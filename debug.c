@@ -52,7 +52,7 @@ int main(int argc,
 }
 
 /* 
-
+                                                          
 https://www.muylinux.com/2010/08/29/estilos-css-para-gtk/
 https://atareao.es/ubuntu/gtk-con-css-y-gnome/
 */

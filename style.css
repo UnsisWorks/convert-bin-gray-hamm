@@ -21,7 +21,7 @@ button {
   background: rgb(25, 25, 25);
   color: whitesmoke;
   border: black;
-  transition: all 2s;
+  transition: all 1s;
 }
 .button:hover {
   box-shadow: 2px 2px 20px 10px whitesmoke;

@@ -1,4 +1,4 @@
-// #include "gtk_auto.h"
+//#include "gtk_auto.h"
 #include <gtk/gtk.h>
 
 // funtion construct
@@ -7,8 +7,13 @@ static void activate (GtkApplication *app, gpointer user_data) {
     GtkWidget *window, *mainBox;
     GtkWidget *buttBoxConvert, *buttBoxHam, *buttBoxError, * buttBoxSuma;
     GtkWidget *buttonConvert, *buttonHam, *buttonError, *buttonSuma;
+    GtkWidget *butt, *image;
     GtkStyleContext *style;
     GtkCssProvider *cssProvider;
+
+    image = gtk_image_new_from_file("./image/wallpaperPrincipal.jpg");
+    butt = gtk_button_new();
+    gtk_button_set_image(GTK_BUTTON(butt), image);
     // Cargar estilos css
     cssProvider = gtk_css_provider_new();
 
