@@ -1,12 +1,11 @@
 #include <gtk/gtk.h>
 #include <string.h>
+// @import url("./style.css");
 
-static void
-activate(GtkApplication *app,
-         gpointer user_data)
-{
+static void activate(GtkApplication *app, gpointer user_data){
 
     GtkWidget *window = gtk_application_window_new(app);
+    gtk_window_set_default_size(GTK_WINDOW(window), 500, 500);
     
     GtkWidget *button_01 = gtk_button_new_with_label("This is button 01");
     GtkWidget *button_02 = gtk_button_new_with_label("This is button 02");
@@ -16,6 +15,9 @@ activate(GtkApplication *app,
     GtkWidget *main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 25);
 
     gtk_widget_set_name(GTK_WIDGET(label0), "label");
+    // gtk_widget_set_name(GTK_WIDGET(buttBoxError), "butt");
+    gtk_widget_set_name(GTK_WIDGET(buttonSuma), "butt");
+    // gtk_widget_set_name(GTK_WIDGET(buttBoxHam), "butt");
 
     GtkCssProvider *cssProvider = gtk_css_provider_new();
     gtk_css_provider_load_from_path(cssProvider, "./style.css", NULL);

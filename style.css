@@ -1,9 +1,29 @@
-.label#label0 {
-    color: red;
-  }
-.label#label1 {
-    color: green;
-  }
-.label#label2 {
-    color: blue;
-  }
+/* #box {
+  background-image: linear-gradient(0deg, rgb(85, 232, 232), rgb(0, 105, 105));
+}
+window button {
+  font-size: 20px;
+  color: black;
+  background-color: yellowgreen;
+} 
+button {
+  background: rgb(15, 170, 90);
+  color: whitesmoke;
+  box-shadow: 2px 2px 2px 10px rgba(0, 0, 0, 0.2);
+} */
+
+#box {
+  background-color: rgb(25, 25, 25);
+}
+
+.button {
+  font-size: 20px;
+  background: rgb(25, 25, 25);
+  color: whitesmoke;
+  border: black;
+  transition: all 2s;
+}
+.button:hover {
+  box-shadow: 2px 2px 20px 10px whitesmoke;
+  transform: scale(1.2);
+}
