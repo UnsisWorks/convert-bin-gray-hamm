@@ -22,8 +22,8 @@ button {
   color: whitesmoke;
   border: black;
   transition: all 1s;
+  border-radius: 40%;
 }
 .button:hover {
   box-shadow: 2px 2px 20px 10px whitesmoke;
-  transform: scale(1.2);
 }

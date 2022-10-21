@@ -1,19 +1,45 @@
 //#include "gtk_auto.h"
 #include <gtk/gtk.h>
 
+GtkWidget *mainWindow;
+
+// Function construct for window the button convert binario to gray
+static void convert(GtkWidget *widget, GtkWidget *s) {
+    gtk_widget_set_visible(GTK_WIDGET(mainWindow), FALSE);
+    GtkWidget *window, *bin, *gray, *fixed;
+    GtkWidget *binLab, *grayLab;
+    fixed = gtk_fixed_new();
+
+    // Create entrys for convert
+    bin = gtk_entry_new();
+    gray = gtk_entry_new();
+    binLab = gtk_label_new("Binario");
+    grayLab = gtk_label_new("Gray");
+
+    // Set components at fixed 
+    gtk_fixed_put(GTK_FIXED(fixed), binLab, 100, 55);
+    gtk_fixed_put(GTK_FIXED(fixed), bin, 100, 70);
+    gtk_fixed_put(GTK_FIXED(fixed), grayLab, 100, 170);
+    gtk_fixed_put(GTK_FIXED(fixed), gray, 100, 190);
+
+    // Create new window
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_default_size(GTK_WINDOW(window), 350, 500);
+    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+
+    gtk_container_add(GTK_CONTAINER(window), fixed);
+    gtk_widget_show_all(window);
+}
+
 // funtion construct
 static void activate (GtkApplication *app, gpointer user_data) {
 
-    GtkWidget *window, *mainBox;
+    GtkWidget *mainBox;
     GtkWidget *buttBoxConvert, *buttBoxHam, *buttBoxError, * buttBoxSuma;
     GtkWidget *buttonConvert, *buttonHam, *buttonError, *buttonSuma;
-    GtkWidget *butt, *image;
     GtkStyleContext *style;
     GtkCssProvider *cssProvider;
-
-    image = gtk_image_new_from_file("./image/wallpaperPrincipal.jpg");
-    butt = gtk_button_new();
-    gtk_button_set_image(GTK_BUTTON(butt), image);
+    
     // Cargar estilos css
     cssProvider = gtk_css_provider_new();
 
@@ -32,6 +58,9 @@ static void activate (GtkApplication *app, gpointer user_data) {
     buttonSuma = gtk_button_new_with_label("Sumar formato Gray");
     buttonHam = gtk_button_new_with_label("Código Hamming");
     buttonError = gtk_button_new_with_label("Deteccion y correcion de errores");
+
+    // Create signals for buttons
+    g_signal_connect(buttonConvert, "clicked", G_CALLBACK(convert), NULL);
 
     // gtk_button_set_relief(GTK_BUTTON(buttonConvert), GTK_RELIEF_HALF);
     // Add buttons at button box
@@ -66,14 +95,14 @@ static void activate (GtkApplication *app, gpointer user_data) {
                                             GTK_STYLE_PROVIDER_PRIORITY_USER);
 
     // Set properties for winow
-    window = gtk_application_window_new (app);
-    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
-    gtk_window_set_title (GTK_WINDOW (window), "Window");
-    gtk_window_set_default_size (GTK_WINDOW (window), 800, 600);
-    gtk_window_set_resizable(GTK_WINDOW(window), TRUE);
+    mainWindow = gtk_application_window_new (app);
+    gtk_window_set_position(GTK_WINDOW(mainWindow), GTK_WIN_POS_CENTER);
+    gtk_window_set_title (GTK_WINDOW (mainWindow), "Window");
+    gtk_window_set_default_size (GTK_WINDOW (mainWindow), 800, 600);
+    gtk_window_set_resizable(GTK_WINDOW(mainWindow), TRUE);
     
-    gtk_container_add(GTK_CONTAINER(window), mainBox);
-    gtk_widget_show_all (window);
+    gtk_container_add(GTK_CONTAINER(mainWindow), mainBox);
+    gtk_widget_show_all (mainWindow);
 }
 
 // funtion main
