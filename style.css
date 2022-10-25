@@ -1,5 +1,5 @@
 #box {
-  background-image: linear-gradient(0deg, #256D7B, #181918 40%);
+  background-image: linear-gradient(0deg, #256D7B, #181918 65%);
 }
 /* .button {
   background: #00838f00;
@@ -23,7 +23,7 @@
 }
 
 /* Styles for window bin-gray */
-#box-convert {
+#box-convert, #box-hamming {
   background: linear-gradient(0deg, rgb(36, 126, 126), rgb(27, 51, 51));
 }
 .label-convert {

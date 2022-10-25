@@ -2,6 +2,28 @@
 
 GtkWidget *mainWindow, *bin, *gray;
 
+static void showMessage (GtkWidget *widget, gchar *message, gchar *title) {
+    GtkWidget *dialog, *label, *contentArea;
+    GtkDialogFlags flags;
+
+    // Create at window dialog with title, parent, flags, text in button
+    dialog = gtk_dialog_new_with_buttons(title, NULL, flags, "Aceptar", GTK_RESPONSE_NONE, NULL);
+
+    // Set properties at window dialog
+    contentArea = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    gtk_window_set_default_size(GTK_WINDOW(dialog), 200, 200);
+    gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER_ON_PARENT );
+    gtk_window_set_resizable(GTK_WINDOW(dialog), FALSE);
+    label = gtk_label_new(message);
+    // gtk_label
+
+    // Close window dialog to the price button accept
+    g_signal_connect_swapped(dialog, "response", G_CALLBACK(gtk_widget_destroy), dialog);
+    // Add witget and show result
+    gtk_container_add(GTK_CONTAINER(contentArea), label);
+    gtk_widget_show_all(dialog);
+}
+
 // Funtion for cast bin to gray and reverse
 static void binToGray(GtkWidget *widget, gpointer user_data) {
     // get text the entrys
@@ -24,14 +46,33 @@ static void binToGray(GtkWidget *widget, gpointer user_data) {
     }
     
     if (count == 1) {
+        gboolean flag = TRUE;
+        for (gint i = 0; i <= (value->len) - 1; i++) {
+            // Compare chars the object string with '0', '1' y '.'
+            if (!((value->str[i] == '0') || value->str[i] == '1'/* || value->str[i] == '.'*/)) {
+                flag = FALSE;
+                break;
+            }
+        }
         g_print("Continue\n");
         switch (type) {
         case 0:
             // Code for cast Bin to Gray -- Valid
-            
+            // Iterat value (except char end string '\0')
+
+            if (flag) {
+
+
+            } else {
+                showMessage(NULL, "Ingresar unicamente 0 y 1", "Aviso");
+            }
             break;
         case 1:
             // Code for cast Gray to Bin
+            if (flag) {
+            } else {
+                showMessage(NULL, "Ingresar unicamente 0 y 1", "Aviso");
+            }
             break;
         default:
             break;
@@ -40,7 +81,8 @@ static void binToGray(GtkWidget *widget, gpointer user_data) {
     } else {
         g_print("Not continue\n");
         // MESSAGE WARING
-        g_string_free(value, TRUE);
+        showMessage(NULL, "Debe llenar un campo", "Aviso");
+        //g_string_free(value, TRUE);
     }
 }
 
@@ -110,6 +152,27 @@ static void convert(GtkWidget *widget, GtkWidget *s) {
     gtk_widget_show_all(window);
 }
 
+static void hamming (GtkWidget *widget, gpointer user_data) {
+    gtk_widget_set_visible(GTK_WIDGET(mainWindow), FALSE);
+    GtkWidget *window, *box, *buttBox, *button;
+
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window), "Haming");
+    gtk_window_set_default_size(GTK_WINDOW(window), 300, 500);
+    gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
+
+    buttBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+    button = gtk_button_new_with_label("Obtener Hamming");
+
+    gtk_container_add(GTK_CONTAINER(buttBox), button);
+
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 25);
+    gtk_widget_set_name(GTK_WIDGET(box), "box-hamming");
+
+    gtk_container_add(GTK_CONTAINER(window), box);
+
+    gtk_widget_show_all(window);
+}
 // funtion construct
 static void activate (GtkApplication *app, gpointer user_data) {
 
@@ -140,6 +203,7 @@ static void activate (GtkApplication *app, gpointer user_data) {
 
     // Create signals for buttons
     g_signal_connect(buttonConvert, "clicked", G_CALLBACK(convert), NULL);
+    g_signal_connect(buttonHam, "clicked", G_CALLBACK(hamming), NULL);
 
     // gtk_button_set_relief(GTK_BUTTON(buttonConvert), GTK_RELIEF_HALF);
     // Add buttons at button box
