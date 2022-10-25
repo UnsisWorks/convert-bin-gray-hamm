@@ -1,29 +1,38 @@
-/* #box {
-  background-image: linear-gradient(0deg, rgb(85, 232, 232), rgb(0, 105, 105));
+#box {
+  background-image: linear-gradient(0deg, #256D7B, #181918 40%);
 }
-window button {
-  font-size: 20px;
-  color: black;
-  background-color: yellowgreen;
-} 
-button {
-  background: rgb(15, 170, 90);
+/* .button {
+  background: #00838f00;
   color: whitesmoke;
   box-shadow: 2px 2px 2px 10px rgba(0, 0, 0, 0.2);
 } */
 
-#box {
-  background-color: rgb(25, 25, 25);
-}
-
 .button {
   font-size: 20px;
-  background: rgb(25, 25, 25);
+  background-image: linear-gradient(0deg, #256D7B, #181918);
   color: whitesmoke;
   border: black;
   transition: all 1s;
-  border-radius: 40%;
+  border-radius: 10%;
+  font-size: 18px;
+  font-weight: 900;
 }
 .button:hover {
+  background-image: linear-gradient(0deg, #181918, #256D7B);
   box-shadow: 2px 2px 20px 10px whitesmoke;
+}
+
+/* Styles for window bin-gray */
+#box-convert {
+  background: linear-gradient(0deg, rgb(36, 126, 126), rgb(27, 51, 51));
+}
+.label-convert {
+  font-size: 18px;
+  font-weight: 700;
+  color: whitesmoke;
+}
+.entry-convert {
+  background: rgba(0, 255, 255, 0);
+  color: whitesmoke;
+  font-size: 17px;
 }

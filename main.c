@@ -1,33 +1,73 @@
-//#include "gtk_auto.h"
 #include <gtk/gtk.h>
 
-GtkWidget *mainWindow;
+GtkWidget *mainWindow, *bin, *gray;
+
+static void binToGray(GtkWidget *widget, gpointer user_data) {
+
+}
+
+// Funtion general for set visible in TRUE in main window
+static void closeWindow(GtkWidget *widget, gpointer user_data) {
+    gtk_widget_set_visible(GTK_WIDGET(mainWindow), TRUE);
+}
 
 // Function construct for window the button convert binario to gray
 static void convert(GtkWidget *widget, GtkWidget *s) {
     gtk_widget_set_visible(GTK_WIDGET(mainWindow), FALSE);
-    GtkWidget *window, *bin, *gray, *fixed;
-    GtkWidget *binLab, *grayLab;
-    fixed = gtk_fixed_new();
+    GtkWidget *window, *box, *fixedBin, *fixedGray;
+    GtkWidget *binLab, *grayLab, *buttBox, *button;
+
+    // Create Containers for widgets
+    fixedBin = gtk_fixed_new();
+    fixedGray = gtk_fixed_new();
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL , 25);
 
     // Create entrys for convert
     bin = gtk_entry_new();
     gray = gtk_entry_new();
+    // Set properties at entry widgets
+    gtk_widget_set_size_request(GTK_WIDGET(bin), 210, 35);
+    gtk_widget_set_size_request(GTK_WIDGET(gray), 210, 35);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(bin), "Binario");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(gray), "Formato Gray");
+    gtk_entry_set_alignment(GTK_ENTRY(bin), 0.5);
+    gtk_entry_set_alignment(GTK_ENTRY(gray), 0.5);
+
     binLab = gtk_label_new("Binario");
     grayLab = gtk_label_new("Gray");
 
-    // Set components at fixed 
-    gtk_fixed_put(GTK_FIXED(fixed), binLab, 100, 55);
-    gtk_fixed_put(GTK_FIXED(fixed), bin, 100, 70);
-    gtk_fixed_put(GTK_FIXED(fixed), grayLab, 100, 170);
-    gtk_fixed_put(GTK_FIXED(fixed), gray, 100, 190);
+    buttBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+    button = gtk_button_new_with_label("Convertir");
+    gtk_container_add(GTK_CONTAINER(buttBox), button);
+
+    // Add widgets at container fixed
+    gtk_fixed_put(GTK_FIXED(fixedBin), binLab, 30, 0);
+    gtk_fixed_put(GTK_FIXED(fixedBin), bin, 30, 40);
+    gtk_fixed_put(GTK_FIXED(fixedGray), grayLab, 30, 0);
+    gtk_fixed_put(GTK_FIXED(fixedGray), gray, 30, 40);
+
+    // Set components at box 
+    gtk_box_pack_start(GTK_BOX(box), fixedBin, FALSE, FALSE, 25);
+    gtk_box_pack_start(GTK_BOX(box), fixedGray, FALSE, FALSE, 25);
+    gtk_box_pack_start(GTK_BOX(box), buttBox, FALSE, FALSE, 25);
 
     // Create new window
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_default_size(GTK_WINDOW(window), 350, 500);
-    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+    gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
+    gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ON_PARENT);
+    // gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
+    // g_signal_connect(window, "destroy", G_CALLBACK(closeWindow), NULL);
 
-    gtk_container_add(GTK_CONTAINER(window), fixed);
+    // Set class for reference in CSS
+    gtk_widget_set_name(GTK_WIDGET(box), "box-convert");
+
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(binLab)), "label-convert");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(grayLab)), "label-convert");
+
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(bin)), "entry-convert");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(gray)), "entry-convert");
+
+    gtk_container_add(GTK_CONTAINER(window), box);
     gtk_widget_show_all(window);
 }
 
@@ -89,6 +129,7 @@ static void activate (GtkApplication *app, gpointer user_data) {
 
     gtk_widget_set_name(GTK_WIDGET(mainBox), "box");
 
+    // Load style for CSS file
     gtk_css_provider_load_from_path(cssProvider, "./style.css", NULL);
     gtk_style_context_add_provider_for_screen(gdk_screen_get_default(),
                                             GTK_STYLE_PROVIDER(cssProvider),
@@ -98,7 +139,7 @@ static void activate (GtkApplication *app, gpointer user_data) {
     mainWindow = gtk_application_window_new (app);
     gtk_window_set_position(GTK_WINDOW(mainWindow), GTK_WIN_POS_CENTER);
     gtk_window_set_title (GTK_WINDOW (mainWindow), "Window");
-    gtk_window_set_default_size (GTK_WINDOW (mainWindow), 800, 600);
+    gtk_window_set_default_size (GTK_WINDOW (mainWindow), 600, 800);
     gtk_window_set_resizable(GTK_WINDOW(mainWindow), TRUE);
     
     gtk_container_add(GTK_CONTAINER(mainWindow), mainBox);
