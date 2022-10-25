@@ -2,8 +2,46 @@
 
 GtkWidget *mainWindow, *bin, *gray;
 
+// Funtion for cast bin to gray and reverse
 static void binToGray(GtkWidget *widget, gpointer user_data) {
+    // get text the entrys
+    const gchar *binary = gtk_entry_get_text(GTK_ENTRY(bin));
+    const gchar *sgray = gtk_entry_get_text(GTK_ENTRY(gray));
+    GString *value;
+    gint type = 0;
+    gint count = 0;
 
+    // Confirm string with contain
+    if (!strcmp(binary, "") == 0) {
+        type = 0;
+        count++;
+        value = g_string_new(binary);
+    }
+    if (!strcmp(sgray, "") == 0) {
+        count++;
+        type = 1;
+        value = g_string_new(sgray);
+    }
+    
+    if (count == 1) {
+        g_print("Continue\n");
+        switch (type) {
+        case 0:
+            // Code for cast Bin to Gray -- Valid
+            
+            break;
+        case 1:
+            // Code for cast Gray to Bin
+            break;
+        default:
+            break;
+        }
+        
+    } else {
+        g_print("Not continue\n");
+        // MESSAGE WARING
+        g_string_free(value, TRUE);
+    }
 }
 
 // Funtion general for set visible in TRUE in main window
@@ -38,6 +76,7 @@ static void convert(GtkWidget *widget, GtkWidget *s) {
 
     buttBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     button = gtk_button_new_with_label("Convertir");
+    g_signal_connect(button, "clicked", G_CALLBACK(binToGray), NULL);
     gtk_container_add(GTK_CONTAINER(buttBox), button);
 
     // Add widgets at container fixed
