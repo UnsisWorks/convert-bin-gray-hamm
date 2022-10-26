@@ -1,6 +1,7 @@
 #include <gtk/gtk.h>
+#include <math.h>
 
-GtkWidget *mainWindow, *bin, *gray;
+GtkWidget *mainWindow, *bin, *gray, *combo;
 
 static void showMessage (GtkWidget *widget, gchar *message, gchar *title) {
     GtkWidget *dialog, *label, *contentArea;
@@ -191,6 +192,102 @@ static void hamming (GtkWidget *widget, gpointer user_data) {
     gtk_widget_show_all(window);
 }
 
+static void detectionHamming (GtkWidget *widget, GtkWidget user_data) {
+    // get text the entrys
+    const gchar *binary = gtk_entry_get_text(GTK_ENTRY(bin));
+    GString *value;
+    gint type = 0;
+    gint count = 0;
+
+    // Confirm string with contain
+    if (!strcmp(binary, "") == 0) {
+        type = 0;
+        count++;
+        value = g_string_new(binary);
+    }
+    
+    if (count == 1) {
+        gboolean flag = TRUE;
+        for (gint i = 0; i <= (value->len) - 1; i++) {
+            // Compare chars the object string with '0', '1' y '.'
+            if (!((value->str[i] == '0') || value->str[i] == '1'/* || value->str[i] == '.'*/)) {
+                flag = FALSE;
+                break;
+            }
+        }
+        if (flag) {
+            type = gtk_combo_box_get_active(GTK_COMBO_BOX(combo));
+            if (type != 0) {
+                // Continiue
+                gint p = 0;
+                // while (1) {
+                //     p++;
+                    // if (pow(2, p) > (value->len - 1) + p + 1) {
+                    //     break;
+                    // }
+                    
+                g_print("\nP: %d\n", p);
+                
+            } else {
+                showMessage(NULL, "Debe seleccionar un tipo de paridad", "Advertencia");
+            }
+            
+        } else {
+            showMessage(NULL, "Solo debe ingresar 1 - 0", "Advertencia");
+        }
+    } else {
+        showMessage(NULL, "Debe llenar el campo", "Advertencia");
+    }
+}
+
+// Create interface for button signal "Correción y deteciión de errores"
+static void correctionHamming (GtkWidget *widget, gpointer user_data) {
+    gtk_widget_set_visible(GTK_WIDGET(mainWindow), FALSE);
+    GtkWidget *window, *box, *buttBox, *button, *label, *fixed;
+
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 25);
+    fixed = gtk_fixed_new();
+    gtk_box_pack_start(GTK_BOX(box), fixed, FALSE, FALSE, 0);
+    combo = gtk_combo_box_text_new_with_entry();
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), "    Tipo de paridad");
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), "   Bit de paridad par");
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), "Bit de paridad impar");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
+
+    // Create window
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window), "Haming");
+    gtk_window_set_default_size(GTK_WINDOW(window), 400, 300);
+    gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
+    g_signal_connect(window, "destroy", G_CALLBACK(closeWindow), NULL);
+
+    buttBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+    button = gtk_button_new_with_label("Obtener Hamming");
+    g_signal_connect(button, "clicked", G_CALLBACK(detectionHamming), bin);
+    gtk_container_add(GTK_CONTAINER(buttBox), button);
+
+    label = gtk_label_new("Binario");
+    bin = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(bin), "Binario");
+    gtk_widget_set_size_request(GTK_WIDGET(bin), 230, 35);
+    gtk_entry_set_alignment(GTK_ENTRY(bin), 0.5);
+
+    // Add widgets at fixed
+    gtk_fixed_put(GTK_FIXED(fixed), label, 35, 30);
+    gtk_fixed_put(GTK_FIXED(fixed), bin, 35, 50);
+    gtk_fixed_put(GTK_FIXED(fixed), buttBox, 55, 115);
+    gtk_fixed_put(GTK_FIXED(fixed), combo, 280, 50);
+
+    gtk_widget_set_name(GTK_WIDGET(box), "box-error");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(label)), "label-error");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(button)), "button-error");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(bin)), "entry-error");
+
+    gtk_container_add(GTK_CONTAINER(window), box);
+
+    gtk_widget_show_all(window);
+}
+
 static void sumaGray(GtkWidget *widget, gpointer user_data){
     gtk_widget_set_visible(GTK_WIDGET(mainWindow), FALSE);
     GtkWidget *window, *box, *buttBox, *button, *label, *fixed, *stGray, *ndGray;
@@ -267,6 +364,7 @@ static void activate (GtkApplication *app, gpointer user_data) {
     g_signal_connect(buttonConvert, "clicked", G_CALLBACK(convert), NULL);
     g_signal_connect(buttonHam, "clicked", G_CALLBACK(hamming), NULL);
     g_signal_connect(buttonSuma, "clicked", G_CALLBACK(sumaGray), NULL);
+    g_signal_connect(buttonError, "clicked", G_CALLBACK(correctionHamming), NULL);
 
     // gtk_button_set_relief(GTK_BUTTON(buttonConvert), GTK_RELIEF_HALF);
     // Add buttons at button box
