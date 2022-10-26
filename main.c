@@ -192,6 +192,22 @@ static void hamming (GtkWidget *widget, gpointer user_data) {
     gtk_widget_show_all(window);
 }
 
+// Convert decimal to binary
+const gchar* decToBin(gint64 decimal){
+    GString *mod = g_string_new("");
+    int result;
+    result = decimal;
+    char aux[25];
+    while (result != 0) {
+        // Conversión y obtención de modulo
+        sprintf(aux, "%d", (result % 2));
+        result = result / 2;
+        // g_print("mod2: %s\n", aux);
+        
+        mod = g_string_prepend(mod, aux);
+    }
+    return mod->str;
+}
 static void detectionHamming (GtkWidget *widget, GtkWidget user_data) {
     // get text the entrys
     const gchar *binary = gtk_entry_get_text(GTK_ENTRY(bin));
@@ -217,17 +233,35 @@ static void detectionHamming (GtkWidget *widget, GtkWidget user_data) {
         }
         if (flag) {
             type = gtk_combo_box_get_active(GTK_COMBO_BOX(combo));
-            if (type != 0) {
+            GString *position = g_string_new("");
+            count = 0;
+            //  Paridad par
+            if (type == 1) {
                 // Continiue
-                gint p = 0;
-                // while (1) {
-                //     p++;
-                    // if (pow(2, p) > (value->len - 1) + p + 1) {
-                    //     break;
-                    // }
+                int index = value->len - 1;
+                for (int i = 0; i < index; i++) {
+                    // Get position in binary
+                    position = g_string_assign(position, decToBin(i + 1));
+                    for (int j = 0; j < position->len; j++) {
+                        if (position->str[i] == '1') {
+                            count++;
+                        }
+                    }
+                    // Asignar bit de paridad ligado
+                    if (count == 1){
+                        
+                    } else {
+
+                    }
                     
-                g_print("\nP: %d\n", p);
+                    
+                }
                 
+                
+            // Paridad impar
+            } else if (type == 2) {
+
+            // Type not selected
             } else {
                 showMessage(NULL, "Debe seleccionar un tipo de paridad", "Advertencia");
             }
