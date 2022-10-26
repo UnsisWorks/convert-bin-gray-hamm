@@ -136,8 +136,8 @@ static void convert(GtkWidget *widget, GtkWidget *s) {
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER_ON_PARENT);
-    // gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
-    // g_signal_connect(window, "destroy", G_CALLBACK(closeWindow), NULL);
+    gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
+    g_signal_connect(window, "destroy", G_CALLBACK(closeWindow), NULL);
 
     // Set class for reference in CSS
     gtk_widget_set_name(GTK_WIDGET(box), "box-convert");
@@ -152,22 +152,84 @@ static void convert(GtkWidget *widget, GtkWidget *s) {
     gtk_widget_show_all(window);
 }
 
+// Create interface for button signal "Hamming"
 static void hamming (GtkWidget *widget, gpointer user_data) {
     gtk_widget_set_visible(GTK_WIDGET(mainWindow), FALSE);
-    GtkWidget *window, *box, *buttBox, *button;
+    GtkWidget *window, *box, *buttBox, *button, *label, *fixed;
 
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 25);
+    fixed = gtk_fixed_new();
+    gtk_box_pack_start(GTK_BOX(box), fixed, FALSE, FALSE, 0);
+
+    // Create window
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window), "Haming");
-    gtk_window_set_default_size(GTK_WINDOW(window), 300, 500);
+    gtk_window_set_default_size(GTK_WINDOW(window), 350, 300);
     gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
+    g_signal_connect(window, "destroy", G_CALLBACK(closeWindow), NULL);
 
     buttBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     button = gtk_button_new_with_label("Obtener Hamming");
-
     gtk_container_add(GTK_CONTAINER(buttBox), button);
 
-    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 25);
+    label = gtk_label_new("Binario");
+    bin = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(bin), "Binario");
+    gtk_widget_set_size_request(GTK_WIDGET(bin), 230, 35);
+
+    // Add widgets at fixed
+    gtk_fixed_put(GTK_FIXED(fixed), label, 35, 30);
+    gtk_fixed_put(GTK_FIXED(fixed), bin, 35, 50);
+    gtk_fixed_put(GTK_FIXED(fixed), buttBox, 55, 115);
+
     gtk_widget_set_name(GTK_WIDGET(box), "box-hamming");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(label)), "label-hamming");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(button)), "button-hamming");
+
+    gtk_container_add(GTK_CONTAINER(window), box);
+
+    gtk_widget_show_all(window);
+}
+
+static void sumaGray(GtkWidget *widget, gpointer user_data){
+    gtk_widget_set_visible(GTK_WIDGET(mainWindow), FALSE);
+    GtkWidget *window, *box, *buttBox, *button, *label, *fixed, *stGray, *ndGray;
+
+    box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 25);
+    fixed = gtk_fixed_new();
+    gtk_box_pack_start(GTK_BOX(box), fixed, FALSE, FALSE, 0);
+
+    // Create window
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(window), "Sumar formato Gray");
+    gtk_window_set_default_size(GTK_WINDOW(window), 350, 300);
+    gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
+    g_signal_connect(window, "destroy", G_CALLBACK(closeWindow), NULL);
+
+    buttBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
+    button = gtk_button_new_with_label("Sumar");
+    gtk_container_add(GTK_CONTAINER(buttBox), button);
+
+    label = gtk_label_new("Primer gray");
+    stGray = gtk_entry_new();
+    ndGray = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(stGray), "Binario");
+    gtk_widget_set_size_request(GTK_WIDGET(stGray), 230, 35);
+    gtk_entry_set_alignment(GTK_ENTRY(stGray), 0.5);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(ndGray), "Binario");
+    gtk_widget_set_size_request(GTK_WIDGET(ndGray), 230, 35);
+    gtk_entry_set_alignment(GTK_ENTRY(ndGray), 0.5);
+
+    // Add widgets at fixed
+    gtk_fixed_put(GTK_FIXED(fixed), label, 35, 30);
+    gtk_fixed_put(GTK_FIXED(fixed), stGray, 35, 50);
+    gtk_fixed_put(GTK_FIXED(fixed), ndGray, 35, 100);
+    gtk_fixed_put(GTK_FIXED(fixed), buttBox, 55, 175);
+
+    gtk_widget_set_name(GTK_WIDGET(box), "box-hamming");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(label)), "label-hamming");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(button)), "button-hamming");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(stGray)), "entry-hamming");
 
     gtk_container_add(GTK_CONTAINER(window), box);
 
@@ -204,6 +266,7 @@ static void activate (GtkApplication *app, gpointer user_data) {
     // Create signals for buttons
     g_signal_connect(buttonConvert, "clicked", G_CALLBACK(convert), NULL);
     g_signal_connect(buttonHam, "clicked", G_CALLBACK(hamming), NULL);
+    g_signal_connect(buttonSuma, "clicked", G_CALLBACK(sumaGray), NULL);
 
     // gtk_button_set_relief(GTK_BUTTON(buttonConvert), GTK_RELIEF_HALF);
     // Add buttons at button box
