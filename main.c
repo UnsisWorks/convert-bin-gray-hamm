@@ -193,7 +193,7 @@ static void hamming (GtkWidget *widget, gpointer user_data) {
 }
 
 // Convert decimal to binary
-const gchar* decToBin(gint64 decimal){
+const gchar* decToBin(gint64 decimal , int returns){
     GString *mod = g_string_new("");
     int result;
     result = decimal;
@@ -234,34 +234,46 @@ static void detectionHamming (GtkWidget *widget, GtkWidget user_data) {
         if (flag) {
             type = gtk_combo_box_get_active(GTK_COMBO_BOX(combo));
             GString *position = g_string_new("");
-            count = 0;
-            //  Paridad par
-            if (type == 1) {
-                // Continiue
-                int index = value->len - 1;
+            
+            if (type != 0) {
+                
+                // Localizar bits de paridad
+                int index = value->len;
+                int bitParidad[index];
                 for (int i = 0; i < index; i++) {
                     // Get position in binary
                     position = g_string_assign(position, decToBin(i + 1));
+                    count = 0;
+                    g_print("Posicion: %d bin: %s\n", i + 1, position->str);
                     for (int j = 0; j < position->len; j++) {
-                        if (position->str[i] == '1') {
+                        if (position->str[j] == '1') {
                             count++;
                         }
                     }
                     // Asignar bit de paridad ligado
                     if (count == 1){
-                        
+                        bitParidad[i] = 1;
+                        // g_print("Paridad - %d", i);
                     } else {
-
+                        bitParidad[i] = 0;
+                        // g_print("Valor - %d", i);
                     }
-                    
-                    
+                    puts("");
                 }
-                
-                
-            // Paridad impar
-            } else if (type == 2) {
+                //  Paridad par
+                if (type == 1) {
+                    // Continiue
+                    for (int i = 0; i < index; i++) {
+                        if (bitParidad[i] == 1) {
 
-            // Type not selected
+                        }
+                    }
+                
+                
+                // Paridad impar
+                } else if (type == 2) {
+
+                }
             } else {
                 showMessage(NULL, "Debe seleccionar un tipo de paridad", "Advertencia");
             }
