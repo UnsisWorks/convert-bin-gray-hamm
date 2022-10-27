@@ -2,6 +2,7 @@
 #include <math.h>
 
 GtkWidget *mainWindow, *bin, *gray, *combo;
+gchar format[10];
 
 static void showMessage (GtkWidget *widget, gchar *message, gchar *title) {
     GtkWidget *dialog, *label, *contentArea;
@@ -206,6 +207,33 @@ const gchar* decToBin(gint64 decimal , int returns){
         
         mod = g_string_prepend(mod, aux);
     }
+
+    if (strcmp(format, "-1") == 0){
+        g_print("no format\n");
+    } else {
+            int decimal = atoi(format);
+            g_print("format: %d\n", decimal);
+        // Valid multipl to format
+        gint difference = 0;
+        for (gint i = decimal; i <= (mod->len + decimal); i += decimal) {
+            if (i >= (mod->len - 1)) {
+                difference = i - (mod->len);
+            }
+        }
+        // Add char's for complete multi the 4
+        if (difference < decimal && difference != 0) {
+            for (gint i = 1; i <= difference; i++) {
+                g_string_prepend_c(mod, '0');
+            }
+        }
+    }
+
+    if (returns == 0) {
+        gchar len[5]; // = mod->len + '0';
+        sprintf(len, "%ld", mod->len);
+        const gchar *res = len;
+        return res;
+    }
     return mod->str;
 }
 static void detectionHamming (GtkWidget *widget, GtkWidget user_data) {
@@ -240,9 +268,15 @@ static void detectionHamming (GtkWidget *widget, GtkWidget user_data) {
                 // Localizar bits de paridad
                 int index = value->len;
                 int bitParidad[index];
+                strcpy(format, "-1");
+                const gchar *maxDigits = decToBin(index, 0);
+                strcpy(format, maxDigits);
+                // gchar maxDigits = aux;
+                g_print("Max diigts: %s\n", maxDigits);
                 for (int i = 0; i < index; i++) {
                     // Get position in binary
-                    position = g_string_assign(position, decToBin(i + 1));
+                    g_print("send max: %s\n", maxDigits);
+                    position = g_string_assign(position, decToBin(i + 1, 1));
                     count = 0;
                     g_print("Posicion: %d bin: %s\n", i + 1, position->str);
                     for (int j = 0; j < position->len; j++) {
@@ -265,11 +299,12 @@ static void detectionHamming (GtkWidget *widget, GtkWidget user_data) {
                     // Continiue
                     for (int i = 0; i < index; i++) {
                         if (bitParidad[i] == 1) {
-
+                            for (int j = i; j < index; j++) {
+                                
+                            }
+                            
                         }
                     }
-                
-                
                 // Paridad impar
                 } else if (type == 2) {
 
@@ -298,7 +333,8 @@ static void correctionHamming (GtkWidget *widget, gpointer user_data) {
     gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), "    Tipo de paridad");
     gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), "   Bit de paridad par");
     gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), "Bit de paridad impar");
-    gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
+    // MODIFICAR SELECCION
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 1);
 
     // Create window
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
