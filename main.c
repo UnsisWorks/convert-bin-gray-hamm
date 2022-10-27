@@ -26,6 +26,64 @@ static void showMessage (GtkWidget *widget, gchar *message, gchar *title) {
     gtk_widget_show_all(dialog);
 }
 
+// Cast binary to gray
+void binaryToGray(GString *binario){
+ 
+    //se respeta el mas izquierdo
+    gchar init[2];
+    init[0] = binario->str[0];
+    init[1] = '\0';
+    GString *sgray = g_string_new(init);
+
+    char v;
+    gchar aux[30];
+    // g_print("%s\n", binario->str);
+    //XoR a los elementos
+    for (int i = 1; i < binario->len; i++) {
+        if (i <= binario->len){
+            // g_print("1\n");
+            v = (binario->str[i]);
+            int a = atoi(&v);
+            // g_print("2\n");
+            v = (binario->str[i + 1]);
+            int b = atoi(&v);
+            int c = a ^ b;
+            sprintf(aux, "%d", c);
+            g_print("%d && %d = %d\n",a , b, c);
+            sgray = g_string_append(sgray, aux);
+            // g_print("3\n");
+            // gray += IntToStr(StrToInt(binario[i])^StrToInt(binario[i+1]));
+        }
+    }
+    gtk_entry_set_text(GTK_ENTRY(gray), sgray->str);
+}
+
+// Cast gray to binary
+void grayToBin(GString *sgray){
+ 
+    // init binary with firts bit
+    gchar init[2];
+    init[0] = sgray->str[0];
+    init[1] = '\0';
+    GString *binario = g_string_new(init);
+
+    char v;
+    gchar aux[30];
+    // Apply XOR. 
+    for (int i = 1; i <  sgray->len; i++){
+        v = (sgray->str[i]);
+        int a = atoi(&v);
+        v = (binario->str[i - 1]);
+        int b = atoi(&v);
+        int c = a ^ b;
+        sprintf(aux, "%d", c);
+        g_print("%d && %d = %d\n",b , a, c);
+        binario = g_string_append(binario, aux);
+    }
+    g_print("%s", binario->str);
+    gtk_entry_set_text(GTK_ENTRY(bin), binario->str);
+}
+
 // Funtion for cast bin to gray and reverse
 static void binToGray(GtkWidget *widget, gpointer user_data) {
     // get text the entrys
@@ -56,14 +114,14 @@ static void binToGray(GtkWidget *widget, gpointer user_data) {
                 break;
             }
         }
-        g_print("Continue\n");
         switch (type) {
         case 0:
             // Code for cast Bin to Gray -- Valid
             // Iterat value (except char end string '\0')
 
-            if (flag) {
-
+            if (flag == TRUE) {
+                g_print("Continue\n");
+                binaryToGray(value);
 
             } else {
                 showMessage(NULL, "Ingresar unicamente 0 y 1", "Aviso");
@@ -72,6 +130,8 @@ static void binToGray(GtkWidget *widget, gpointer user_data) {
         case 1:
             // Code for cast Gray to Bin
             if (flag) {
+                g_print("Continue\n");
+                grayToBin(value);
             } else {
                 showMessage(NULL, "Ingresar unicamente 0 y 1", "Aviso");
             }
@@ -154,6 +214,34 @@ static void convert(GtkWidget *widget, GtkWidget *s) {
     gtk_widget_show_all(window);
 }
 
+void generatorHamming (GtkWidget *widget, gpointer user_data) {
+    // get text the entrys
+    const gchar *binary = gtk_entry_get_text(GTK_ENTRY(bin));
+    GString *value;
+    gint count = 0;
+
+    // Confirm string with contain
+    if (!strcmp(binary, "") == 0) {
+        count++;
+        value = g_string_new(binary);
+    }
+    
+    if (count == 1) {
+        gboolean flag = TRUE;
+        for (gint i = 0; i <= (value->len) - 1; i++) {
+            // Compare chars the object string with '0', '1' y '.'
+            if (!((value->str[i] == '0') || value->str[i] == '1'/* || value->str[i] == '.'*/)) {
+                flag = FALSE;
+                break;
+            }
+        }
+        if (falg == TRUE) {
+            
+        }
+        
+    }
+}
+
 // Create interface for button signal "Hamming"
 static void hamming (GtkWidget *widget, gpointer user_data) {
     gtk_widget_set_visible(GTK_WIDGET(mainWindow), FALSE);
@@ -173,6 +261,7 @@ static void hamming (GtkWidget *widget, gpointer user_data) {
     buttBox = gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL);
     button = gtk_button_new_with_label("Obtener Hamming");
     gtk_container_add(GTK_CONTAINER(buttBox), button);
+    g_signal_connect(button, "clicked", G_CALLBACK(generatorHamming), NULL);
 
     label = gtk_label_new("Binario");
     bin = gtk_entry_new();
