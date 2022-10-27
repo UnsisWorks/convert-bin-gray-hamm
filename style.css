@@ -25,7 +25,7 @@
 #box-convert, #box-hamming, #box-error {
   background: linear-gradient(0deg, rgb(36, 126, 126), rgb(27, 51, 51));
 }
-.label-convert, .label-hamming {
+.label-convert, .label-hamming, .label-error {
   font-size: 18px;
   font-weight: 700;
   color: whitesmoke;
