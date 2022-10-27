@@ -4,6 +4,50 @@
 GtkWidget *mainWindow, *bin, *gray, *combo, *labelRequest;
 gchar format[10];
 
+// Convert decimal to binary
+const gchar* decToBin(gint64 decimal , int returns){
+    GString *mod = g_string_new("");
+    int result;
+    result = decimal;
+    char aux[25];
+    while (result != 0) {
+        // Conversión y obtención de modulo
+        sprintf(aux, "%d", (result % 2));
+        result = result / 2;
+        // g_print("mod2: %s\n", aux);
+        
+        mod = g_string_prepend(mod, aux);
+    }
+
+    if (strcmp(format, "-1") == 0){
+        // g_print("no format\n");
+    } else {
+            int decimal = atoi(format);
+            // g_print("format: %d\n", decimal);
+        // Valid multipl to format
+        gint difference = 0;
+        for (gint i = decimal; i <= (mod->len + decimal); i += decimal) {
+            if (i >= (mod->len - 1)) {
+                difference = i - (mod->len);
+            }
+        }
+        // Add char's for complete multi the 4
+        if (difference < decimal && difference != 0) {
+            for (gint i = 1; i <= difference; i++) {
+                g_string_prepend_c(mod, '0');
+            }
+        }
+    }
+
+    if (returns == 0) {
+        gchar len[5]; // = mod->len + '0';
+        sprintf(len, "%ld", mod->len);
+        const gchar *res = len;
+        return res;
+    }
+    return mod->str;
+}
+
 static void showMessage (GtkWidget *widget, gchar *message, gchar *title) {
     GtkWidget *dialog, *label, *contentArea;
     GtkDialogFlags flags;
@@ -235,8 +279,114 @@ void generatorHamming (GtkWidget *widget, gpointer user_data) {
                 break;
             }
         }
-        if (falg == TRUE) {
+        if (flag == TRUE) {
+            // ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+            int bp = 0;
+            while (pow(2, bp) <= value->len + bp + 1){
+                bp++;
+            }
+
+            GString *position = g_string_new("");
+            g_print("bit de paridad: %d\n", bp);
+            // Variables generales de la corrección
+            int index = value->len;
+            int bitParidad[index];
+            strcpy(format, "-1");
+            const gchar *maxDigits = decToBin(bp + index, 0);
+            strcpy(format, maxDigits);
+            char positions[index][50];
+            GString *password = g_string_new("");
+            GString *request = g_string_new("");
+            // g_print("Max diigts: %s\n", maxDigits);
             
+            // Localizar bits de paridad
+            for (int i = 0; i < index + bp; i++) {
+                // Get position in binary
+                // g_print("send max: %s\n", maxDigits);
+                position = g_string_assign(position, decToBin(i + 1, 1));
+                // Save position in format binary
+                strcpy(positions[i], position->str);
+                count = 0;
+                g_print("Posicion: %d bin: %s\n", i + 1, position->str);
+                for (int j = 0; j < position->len; j++) {
+                    if (position->str[j] == '1') {
+                        count++;
+                    }
+                }
+                // Asignar bit de paridad ligado
+                if (count == 1){
+                    bitParidad[i] = 1;
+                    // g_print("Paridad - %d", i);
+                } else {
+                    bitParidad[i] = 0;
+                    // g_print("Valor - %d", i);
+                }
+                puts("");
+            }
+
+            // Continiue
+            count = 0;
+            int k = 0;
+            int l = 0;
+            int emparejador = 0;
+            for (int i = 0; i < index + bp; i++) {
+                // if (bitParidad[i] == ) {
+
+                // }
+                if (bitParidad[i] == 1) {
+                    while (positions[i][k] != '\0') {
+                        // Obtener bit en común para el conteo. emparejador <-
+                        if(positions[i][k] == '1') {
+                            emparejador = k;
+                            break;
+                            // g_print("emparejado en: %d\n", emparejador);
+                        }
+                        // g_print("char: %c - ", positions[i][k]);
+                        k++;
+                    }
+                    puts("");
+                    k = 0;
+                    
+                    for (int j = i; j < index; j++) {
+                        // Recorremos unicamente los DATOS
+                        if ((bitParidad[j] == 0) || j == i) {
+                            // g_print("pre paridad\n");
+                            if (positions[j][emparejador] == '1'){
+                                g_print("Verificar [%d][%d]\t", j, emparejador);
+                                if (value->str[j] == '1') {
+                                    count++;
+                                    g_print(" = 1 count: %d\n", count);
+                                }else {
+                                    g_print(" = 0 count:s %d\n", count);
+                                }
+                            }
+                        }
+                    }
+                    
+                        // Se asegura la paridad par
+                        if (count % 2 == 0) {
+                            g_print("ES UN 0\n");
+                            
+                            password = g_string_prepend_c(password, '0');
+                        } else {
+                            g_print("ES UN 1\n");
+                            password = g_string_prepend_c(password, '1');
+                        }
+                        count = 0;
+                        // g_print("i: %d j: %d\n", i, j);
+                }
+                    // break;
+            }
+            int pass = g_ascii_strtoll(password->str, NULL, 2);
+            g_print("Request clave : %s dec: %d\n", password->str, pass);
+            if (value->str[pass - 1] == '1') {
+                value->str[pass- 1] = '0';
+            } else {
+                value->str[pass- 1] = '1';
+            }
+            g_print("Request finela : %s\n", value->str);
+            gtk_label_set_text(GTK_LABEL(labelRequest), value->str);
+
         }
         
     }
@@ -282,49 +432,7 @@ static void hamming (GtkWidget *widget, gpointer user_data) {
     gtk_widget_show_all(window);
 }
 
-// Convert decimal to binary
-const gchar* decToBin(gint64 decimal , int returns){
-    GString *mod = g_string_new("");
-    int result;
-    result = decimal;
-    char aux[25];
-    while (result != 0) {
-        // Conversión y obtención de modulo
-        sprintf(aux, "%d", (result % 2));
-        result = result / 2;
-        // g_print("mod2: %s\n", aux);
-        
-        mod = g_string_prepend(mod, aux);
-    }
 
-    if (strcmp(format, "-1") == 0){
-        // g_print("no format\n");
-    } else {
-            int decimal = atoi(format);
-            // g_print("format: %d\n", decimal);
-        // Valid multipl to format
-        gint difference = 0;
-        for (gint i = decimal; i <= (mod->len + decimal); i += decimal) {
-            if (i >= (mod->len - 1)) {
-                difference = i - (mod->len);
-            }
-        }
-        // Add char's for complete multi the 4
-        if (difference < decimal && difference != 0) {
-            for (gint i = 1; i <= difference; i++) {
-                g_string_prepend_c(mod, '0');
-            }
-        }
-    }
-
-    if (returns == 0) {
-        gchar len[5]; // = mod->len + '0';
-        sprintf(len, "%ld", mod->len);
-        const gchar *res = len;
-        return res;
-    }
-    return mod->str;
-}
 static void detectionHamming (GtkWidget *widget, GtkWidget user_data) {
     // get text the entrys
     const gchar *binary = gtk_entry_get_text(GTK_ENTRY(bin));
