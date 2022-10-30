@@ -72,31 +72,25 @@ static void showMessage (GtkWidget *widget, gchar *message, gchar *title) {
 
 // Cast binary to gray
 void binaryToGray(GString *binario){
- 
-    //se respeta el mas izquierdo
+    // Init Gray with the firts digit binary
     gchar init[2];
     init[0] = binario->str[0];
     init[1] = '\0';
     GString *sgray = g_string_new(init);
-
     char v;
     gchar aux[30];
-    // g_print("%s\n", binario->str);
-    //XoR a los elementos
-    for (int i = 1; i < binario->len; i++) {
-        if (i <= binario->len){
-            // g_print("1\n");
+    // Apply XoR to the bits
+    for (int i = 0; i < binario->len - 1; i++) {
+        if (i < binario->len){
             v = (binario->str[i]);
             int a = atoi(&v);
-            // g_print("2\n");
             v = (binario->str[i + 1]);
             int b = atoi(&v);
+            // Sum representaation and assingnament to gray
             int c = a ^ b;
             sprintf(aux, "%d", c);
             g_print("%d && %d = %d\n",a , b, c);
-            sgray = g_string_append(sgray, aux);
-            // g_print("3\n");
-            // gray += IntToStr(StrToInt(binario[i])^StrToInt(binario[i+1]));
+            sgray = g_string_append_c(sgray, aux[0]);
         }
     }
     gtk_entry_set_text(GTK_ENTRY(gray), sgray->str);
@@ -211,6 +205,7 @@ static void convert(GtkWidget *widget, GtkWidget *s) {
     // Create entrys for convert
     bin = gtk_entry_new();
     gray = gtk_entry_new();
+
     // Set properties at entry widgets
     gtk_widget_set_size_request(GTK_WIDGET(bin), 210, 35);
     gtk_widget_set_size_request(GTK_WIDGET(gray), 210, 35);
@@ -268,7 +263,7 @@ void generatorHamming (GtkWidget *widget, gpointer user_data) {
     if (!strcmp(binary, "") == 0) {
         count++;
         value = g_string_new(binary);
-    }
+    } 
     
     if (count == 1) {
         gboolean flag = TRUE;
@@ -281,114 +276,146 @@ void generatorHamming (GtkWidget *widget, gpointer user_data) {
         }
         if (flag == TRUE) {
             // ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
-            int bp = 0;
-            while (pow(2, bp) <= value->len + bp + 1){
-                bp++;
-            }
-
-            GString *position = g_string_new("");
-            g_print("bit de paridad: %d\n", bp);
-            // Variables generales de la corrección
-            int index = value->len;
-            int bitParidad[index];
-            strcpy(format, "-1");
-            const gchar *maxDigits = decToBin(bp + index, 0);
-            strcpy(format, maxDigits);
-            char positions[index][50];
-            GString *password = g_string_new("");
-            GString *request = g_string_new("");
-            // g_print("Max diigts: %s\n", maxDigits);
             
-            // Localizar bits de paridad
-            for (int i = 0; i < index + bp; i++) {
-                // Get position in binary
-                // g_print("send max: %s\n", maxDigits);
-                position = g_string_assign(position, decToBin(i + 1, 1));
-                // Save position in format binary
-                strcpy(positions[i], position->str);
-                count = 0;
-                g_print("Posicion: %d bin: %s\n", i + 1, position->str);
-                for (int j = 0; j < position->len; j++) {
-                    if (position->str[j] == '1') {
-                        count++;
-                    }
+            // Confirm selected type parity
+            gint selection = gtk_combo_box_get_active(GTK_COMBO_BOX(combo));
+            if (selection != 0) {
+                // Calc bits paridad
+                int bp = 0;
+                while (pow(2, bp) <= value->len + bp + 1){
+                    bp++;
                 }
-                // Asignar bit de paridad ligado
-                if (count == 1){
-                    bitParidad[i] = 1;
-                    // g_print("Paridad - %d", i);
-                } else {
-                    bitParidad[i] = 0;
-                    // g_print("Valor - %d", i);
-                }
-                puts("");
-            }
 
-            // Continiue
-            count = 0;
-            int k = 0;
-            int l = 0;
-            int emparejador = 0;
-            for (int i = 0; i < index + bp; i++) {
-                // if (bitParidad[i] == ) {
-
-                // }
-                if (bitParidad[i] == 1) {
-                    while (positions[i][k] != '\0') {
-                        // Obtener bit en común para el conteo. emparejador <-
-                        if(positions[i][k] == '1') {
-                            emparejador = k;
-                            break;
-                            // g_print("emparejado en: %d\n", emparejador);
+                GString *position = g_string_new("");
+                g_print("bit de paridad: %d\n", bp);
+                // Create variables for the assignment bits the parity (bp)
+                int index = value->len + bp;
+                int bitParidad[index];
+                strcpy(format, "-1");
+                const gchar *maxDigits = decToBin(index, 0);
+                strcpy(format, maxDigits);
+                char positions[index][50];
+                GString *password = g_string_new("");
+                GString *request = g_string_new("");
+                gchar requestAux[index];
+                g_print("Max diigts: %d\n", index);
+                
+                // locate bits the parity
+                for (int i = 0; i < index; i++) {
+                    // Get position in binary
+                    // g_print("send max: %s\n", maxDigits);
+                    position = g_string_assign(position, decToBin(i + 1, 1));
+                    // Save position in format binary
+                    strcpy(positions[i], position->str);
+                    count = 0;
+                    g_print("Posicion: %d bin: %s\n", i + 1, position->str);
+                    for (int j = 0; j < position->len; j++) {
+                        if (position->str[j] == '1') {
+                            count++;
                         }
-                        // g_print("char: %c - ", positions[i][k]);
-                        k++;
+                    }
+                    // Asignar bit de paridad ligado
+                    if (count == 1){
+                        bitParidad[i] = 1;
+                        // g_print("Paridad - %d", i);
+                    } else {
+                        bitParidad[i] = 0;
+                        // g_print("Valor - %d", i);
                     }
                     puts("");
-                    k = 0;
-                    
-                    for (int j = i; j < index; j++) {
-                        // Recorremos unicamente los DATOS
-                        if ((bitParidad[j] == 0) || j == i) {
-                            // g_print("pre paridad\n");
-                            if (positions[j][emparejador] == '1'){
-                                g_print("Verificar [%d][%d]\t", j, emparejador);
-                                if (value->str[j] == '1') {
-                                    count++;
-                                    g_print(" = 1 count: %d\n", count);
-                                }else {
-                                    g_print(" = 0 count:s %d\n", count);
+                }
+
+                // Continiue
+                count = 0;
+                int k = 0;
+                int l = 0;
+                int emparejador = 0;
+                // Add bits the data
+                for (int i = 0; i < index; i++) {
+                    if (bitParidad[i] == 0) {
+                        requestAux[i] = value->str[k];
+                        k++;
+                    }
+                }
+                k = 0;
+
+                for (int i = 0; i < index; i++) {
+                    // if (bitParidad[i] == ) {
+                    // }
+                    // añadir bits de paridad
+                    if (bitParidad[i] == 1) {
+                        while (positions[i][k] != '\0') {
+                            // Obtener bit en común para el conteo. emparejador <-
+                            if(positions[i][k] == '1') {
+                                emparejador = k;
+                                break;
+                                // g_print("emparejado en: %d\n", emparejador);
+                            }
+                            // g_print("char: %c - ", positions[i][k]);
+                            k++;
+                        }
+                        puts("");
+                        k = 0;
+                        
+                        for (int j = i; j < index; j++) {
+                            // Recorremos unicamente los DATOS
+                            if ((bitParidad[j] == 0)) {
+                                // g_print("pre paridad\n");
+                                if (positions[j][emparejador] == '1'){
+                                    g_print("Verificar [%d][%d]\t", j, emparejador);
+                                    if (requestAux[j] == '1') {
+                                        count++;
+                                        g_print(" = 1 count: %d\n", count);
+                                    }else {
+                                        g_print(" = 0 count:s %d\n", count);
+                                    }
                                 }
                             }
                         }
-                    }
-                    
-                        // Se asegura la paridad par
-                        if (count % 2 == 0) {
-                            g_print("ES UN 0\n");
+                        
+                            if (selection == 1) {
+                                // Se asegura la paridad par
+                                if (count % 2 == 0) {
+                                    g_print("ES UN 0\n");
+                                    requestAux[i] = '0';
+                                    
+                                } else {
+                                    g_print("ES UN 1\n");
+                                    requestAux[i] = '1';
+                                }
+                            } else {
+                                // Se asegura la paridad impar
+                                if (count % 2 != 0) {
+                                    g_print("ES UN 0\n");
+                                    requestAux[i] = '0';
+                                    
+                                } else {
+                                    g_print("ES UN 1\n");
+                                    requestAux[i] = '1';
+                                }
+                            }
                             
-                            password = g_string_prepend_c(password, '0');
-                        } else {
-                            g_print("ES UN 1\n");
-                            password = g_string_prepend_c(password, '1');
-                        }
-                        count = 0;
-                        // g_print("i: %d j: %d\n", i, j);
+                            count = 0;
+                            // g_print("i: %d j: %d\n", i, j);
+                    }
+                        // break;
                 }
-                    // break;
-            }
-            int pass = g_ascii_strtoll(password->str, NULL, 2);
-            g_print("Request clave : %s dec: %d\n", password->str, pass);
-            if (value->str[pass - 1] == '1') {
-                value->str[pass- 1] = '0';
+                // int pass = g_ascii_strtoll(password->str, NULL, 2);
+                g_print("Hamming :");
+                for (int i = 0; i < index; i++) {
+                    g_print(" %c", requestAux[i]);
+                    request = g_string_append_c(request, requestAux[i]);
+                }
+                puts("");
+                
+                gtk_label_set_text(GTK_LABEL(labelRequest), request->str);
             } else {
-                value->str[pass- 1] = '1';
+                printf("no continue\n");
+                showMessage(NULL, "Seleccione el tipo de paridad", "Advertencia");
             }
-            g_print("Request finela : %s\n", value->str);
-            gtk_label_set_text(GTK_LABEL(labelRequest), value->str);
-
         }
-        
+    } else {
+        showMessage(NULL, "Debe ingresar un binario", "Advertenacia");
     }
 }
 
@@ -413,19 +440,30 @@ static void hamming (GtkWidget *widget, gpointer user_data) {
     gtk_container_add(GTK_CONTAINER(buttBox), button);
     g_signal_connect(button, "clicked", G_CALLBACK(generatorHamming), NULL);
 
+    combo = gtk_combo_box_text_new_with_entry();
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), "    Tipo de paridad");
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), "   Bit de paridad par");
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(combo), "Bit de paridad impar");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(combo), 0);
+
     label = gtk_label_new("Binario");
+    labelRequest = gtk_label_new("HAMMING");
     bin = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(bin), "Binario");
     gtk_widget_set_size_request(GTK_WIDGET(bin), 230, 35);
 
     // Add widgets at fixed
     gtk_fixed_put(GTK_FIXED(fixed), label, 35, 30);
+    gtk_fixed_put(GTK_FIXED(fixed), labelRequest, 115, 210);
     gtk_fixed_put(GTK_FIXED(fixed), bin, 35, 50);
-    gtk_fixed_put(GTK_FIXED(fixed), buttBox, 55, 115);
+    gtk_fixed_put(GTK_FIXED(fixed), combo, 55, 112);
+    gtk_fixed_put(GTK_FIXED(fixed), buttBox, 60, 165);
 
     gtk_widget_set_name(GTK_WIDGET(box), "box-hamming");
     gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(label)), "label-hamming");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(labelRequest)), "label-hamming");
     gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(button)), "button-hamming");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(bin)), "entry-hamming");
 
     gtk_container_add(GTK_CONTAINER(window), box);
 
@@ -686,6 +724,11 @@ static void correctionHamming (GtkWidget *widget, gpointer user_data) {
     gtk_widget_show_all(window);
 }
 
+// Funtion for sumary formats grays
+static void sumaryGrays(GtkWidget *widget, gpointer user_data) {
+    const gchar
+}
+// Create inface for signal button 'SumarGray'
 static void sumaGray(GtkWidget *widget, gpointer user_data){
     gtk_widget_set_visible(GTK_WIDGET(mainWindow), FALSE);
     GtkWidget *window, *box, *buttBox, *button, *label, *fixed, *stGray, *ndGray;
@@ -705,26 +748,29 @@ static void sumaGray(GtkWidget *widget, gpointer user_data){
     button = gtk_button_new_with_label("Sumar");
     gtk_container_add(GTK_CONTAINER(buttBox), button);
 
+    g_signal_connect(button, "clicked", G_CALLBACK(sumaryGrays), NULL);
+
     label = gtk_label_new("Primer gray");
-    stGray = gtk_entry_new();
-    ndGray = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(stGray), "Binario");
-    gtk_widget_set_size_request(GTK_WIDGET(stGray), 230, 35);
-    gtk_entry_set_alignment(GTK_ENTRY(stGray), 0.5);
-    gtk_entry_set_placeholder_text(GTK_ENTRY(ndGray), "Binario");
-    gtk_widget_set_size_request(GTK_WIDGET(ndGray), 230, 35);
-    gtk_entry_set_alignment(GTK_ENTRY(ndGray), 0.5);
+    gray = gtk_entry_new();
+    bin = gtk_entry_new();
+    gtk_entry_set_placeholder_text(GTK_ENTRY(gray), "Formato Gray");
+    gtk_widget_set_size_request(GTK_WIDGET(gray), 230, 35);
+    gtk_entry_set_alignment(GTK_ENTRY(gray), 0.5);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(bin), "Formato Gray");
+    gtk_widget_set_size_request(GTK_WIDGET(bin), 230, 35);
+    gtk_entry_set_alignment(GTK_ENTRY(bin), 0.5);
 
     // Add widgets at fixed
-    gtk_fixed_put(GTK_FIXED(fixed), label, 35, 30);
-    gtk_fixed_put(GTK_FIXED(fixed), stGray, 35, 50);
-    gtk_fixed_put(GTK_FIXED(fixed), ndGray, 35, 100);
+    gtk_fixed_put(GTK_FIXED(fixed), label, 35, 20);
+    gtk_fixed_put(GTK_FIXED(fixed), gray, 35, 60);
+    gtk_fixed_put(GTK_FIXED(fixed), bin, 35, 120);
     gtk_fixed_put(GTK_FIXED(fixed), buttBox, 55, 175);
 
     gtk_widget_set_name(GTK_WIDGET(box), "box-hamming");
     gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(label)), "label-hamming");
     gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(button)), "button-hamming");
-    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(stGray)), "entry-hamming");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(gray)), "entry-hamming");
+    gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(bin)), "entry-hamming");
 
     gtk_container_add(GTK_CONTAINER(window), box);
 
@@ -820,4 +866,4 @@ int main (int argc, char **argv) {
     return status;
 }
 
-// Compiler gcc `pkg-config --cflags gtk+-3.0` -o main main.c `pkg-config --libs gtk+-3.0`
+// Compiler gcc `pkg-config --cflags gtk+-3.0` -o main main.c `pkg-config --libs gtk+-3.0` -lm
