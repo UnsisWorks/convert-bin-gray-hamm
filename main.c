@@ -98,16 +98,15 @@ void binaryToGray(GString *binario){
 
 // Cast gray to binary
 void grayToBin(GString *sgray){
- 
     // init binary with firts bit
     gchar init[2];
     init[0] = sgray->str[0];
     init[1] = '\0';
     GString *binario = g_string_new(init);
-
     char v;
     gchar aux[30];
-    // Apply XOR. 
+
+    // Apply XOR at the bits. 
     for (int i = 1; i <  sgray->len; i++){
         v = (sgray->str[i]);
         int a = atoi(&v);
@@ -115,10 +114,8 @@ void grayToBin(GString *sgray){
         int b = atoi(&v);
         int c = a ^ b;
         sprintf(aux, "%d", c);
-        g_print("%d && %d = %d\n",b , a, c);
         binario = g_string_append(binario, aux);
     }
-    g_print("%s", binario->str);
     gtk_entry_set_text(GTK_ENTRY(bin), binario->str);
 }
 
@@ -280,15 +277,15 @@ void generatorHamming (GtkWidget *widget, gpointer user_data) {
             // Confirm selected type parity
             gint selection = gtk_combo_box_get_active(GTK_COMBO_BOX(combo));
             if (selection != 0) {
-                // Calc bits paridad
+                // Calc bits parity
                 int bp = 0;
                 while (pow(2, bp) <= value->len + bp + 1){
                     bp++;
                 }
 
+                // Create variables for the assignment bits the parity (bp)
                 GString *position = g_string_new("");
                 g_print("bit de paridad: %d\n", bp);
-                // Create variables for the assignment bits the parity (bp)
                 int index = value->len + bp;
                 int bitParidad[index];
                 strcpy(format, "-1");
@@ -303,12 +300,10 @@ void generatorHamming (GtkWidget *widget, gpointer user_data) {
                 // locate bits the parity
                 for (int i = 0; i < index; i++) {
                     // Get position in binary
-                    // g_print("send max: %s\n", maxDigits);
                     position = g_string_assign(position, decToBin(i + 1, 1));
                     // Save position in format binary
                     strcpy(positions[i], position->str);
                     count = 0;
-                    g_print("Posicion: %d bin: %s\n", i + 1, position->str);
                     for (int j = 0; j < position->len; j++) {
                         if (position->str[j] == '1') {
                             count++;
@@ -317,15 +312,10 @@ void generatorHamming (GtkWidget *widget, gpointer user_data) {
                     // Asignar bit de paridad ligado
                     if (count == 1){
                         bitParidad[i] = 1;
-                        // g_print("Paridad - %d", i);
                     } else {
                         bitParidad[i] = 0;
-                        // g_print("Valor - %d", i);
                     }
-                    puts("");
                 }
-
-                // Continiue
                 count = 0;
                 int k = 0;
                 int l = 0;
@@ -338,79 +328,59 @@ void generatorHamming (GtkWidget *widget, gpointer user_data) {
                     }
                 }
                 k = 0;
-
+                // Iterate the length of the Hamming
                 for (int i = 0; i < index; i++) {
-                    // if (bitParidad[i] == ) {
-                    // }
-                    // añadir bits de paridad
+                    // Add bits of parity
                     if (bitParidad[i] == 1) {
                         while (positions[i][k] != '\0') {
-                            // Obtener bit en común para el conteo. emparejador <-
+                            // Obtener bit en común para el conteo. -> emparejador <-
                             if(positions[i][k] == '1') {
                                 emparejador = k;
                                 break;
-                                // g_print("emparejado en: %d\n", emparejador);
                             }
-                            // g_print("char: %c - ", positions[i][k]);
                             k++;
                         }
-                        puts("");
                         k = 0;
-                        
+                        // Iterate only DATA and search parity bits (1)
                         for (int j = i; j < index; j++) {
-                            // Recorremos unicamente los DATOS
                             if ((bitParidad[j] == 0)) {
-                                // g_print("pre paridad\n");
+                                // Count the '1' corresponding to parity
                                 if (positions[j][emparejador] == '1'){
-                                    g_print("Verificar [%d][%d]\t", j, emparejador);
                                     if (requestAux[j] == '1') {
                                         count++;
-                                        g_print(" = 1 count: %d\n", count);
-                                    }else {
-                                        g_print(" = 0 count:s %d\n", count);
                                     }
                                 }
                             }
                         }
                         
-                            if (selection == 1) {
-                                // Se asegura la paridad par
-                                if (count % 2 == 0) {
-                                    g_print("ES UN 0\n");
-                                    requestAux[i] = '0';
-                                    
-                                } else {
-                                    g_print("ES UN 1\n");
-                                    requestAux[i] = '1';
-                                }
+                        if (selection == 1) {
+                            // Se asegura la paridad par
+                            if (count % 2 == 0) {
+                                requestAux[i] = '0';
+                                
                             } else {
-                                // Se asegura la paridad impar
-                                if (count % 2 != 0) {
-                                    g_print("ES UN 0\n");
-                                    requestAux[i] = '0';
-                                    
-                                } else {
-                                    g_print("ES UN 1\n");
-                                    requestAux[i] = '1';
-                                }
+                                g_print("ES UN 1\n");
+                                requestAux[i] = '1';
                             }
-                            
-                            count = 0;
-                            // g_print("i: %d j: %d\n", i, j);
+                        } else {
+                            // Se asegura la paridad impar
+                            if (count % 2 != 0) {
+                                requestAux[i] = '0';
+                                
+                            } else {
+                                requestAux[i] = '1';
+                            }
+                        }
+                        count = 0;
                     }
-                        // break;
                 }
-                // int pass = g_ascii_strtoll(password->str, NULL, 2);
-                g_print("Hamming :");
+                // Show results
                 for (int i = 0; i < index; i++) {
                     g_print(" %c", requestAux[i]);
                     request = g_string_append_c(request, requestAux[i]);
                 }
-                puts("");
-                
                 gtk_label_set_text(GTK_LABEL(labelRequest), request->str);
             } else {
-                printf("no continue\n");
                 showMessage(NULL, "Seleccione el tipo de paridad", "Advertencia");
             }
         }
@@ -725,11 +695,11 @@ static void correctionHamming (GtkWidget *widget, gpointer user_data) {
 }
 
 // Funtion for sumary formats grays
-static void sumaryGrays(GtkWidget *widget, gpointer user_data) {
-    const gchar
+static void sumaryBCD(GtkWidget *widget, gpointer user_data) {
+    const gchar ftGray  = 
 }
 // Create inface for signal button 'SumarGray'
-static void sumaGray(GtkWidget *widget, gpointer user_data){
+static void sumaBcd(GtkWidget *widget, gpointer user_data){
     gtk_widget_set_visible(GTK_WIDGET(mainWindow), FALSE);
     GtkWidget *window, *box, *buttBox, *button, *label, *fixed, *stGray, *ndGray;
 
@@ -748,7 +718,7 @@ static void sumaGray(GtkWidget *widget, gpointer user_data){
     button = gtk_button_new_with_label("Sumar");
     gtk_container_add(GTK_CONTAINER(buttBox), button);
 
-    g_signal_connect(button, "clicked", G_CALLBACK(sumaryGrays), NULL);
+    g_signal_connect(button, "clicked", G_CALLBACK(sumaryBCD), NULL);
 
     label = gtk_label_new("Primer gray");
     gray = gtk_entry_new();
@@ -800,14 +770,14 @@ static void activate (GtkApplication *app, gpointer user_data) {
 
     // Create buttons and add at button box
     buttonConvert = gtk_button_new_with_label("Binario - Gray");
-    buttonSuma = gtk_button_new_with_label("Sumar formato Gray");
+    buttonSuma = gtk_button_new_with_label("Sumar formato BCD");
     buttonHam = gtk_button_new_with_label("Código Hamming");
     buttonError = gtk_button_new_with_label("Deteccion y correcion de errores");
 
     // Create signals for buttons
     g_signal_connect(buttonConvert, "clicked", G_CALLBACK(convert), NULL);
     g_signal_connect(buttonHam, "clicked", G_CALLBACK(hamming), NULL);
-    g_signal_connect(buttonSuma, "clicked", G_CALLBACK(sumaGray), NULL);
+    g_signal_connect(buttonSuma, "clicked", G_CALLBACK(sumaBcd()), NULL);
     g_signal_connect(buttonError, "clicked", G_CALLBACK(correctionHamming), NULL);
 
     // gtk_button_set_relief(GTK_BUTTON(buttonConvert), GTK_RELIEF_HALF);
