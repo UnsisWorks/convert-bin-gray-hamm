@@ -696,7 +696,152 @@ static void correctionHamming (GtkWidget *widget, gpointer user_data) {
 
 // Funtion for sumary formats grays
 static void sumaryBCD(GtkWidget *widget, gpointer user_data) {
-    const gchar ftGray  = 
+    const gchar *ftGray  = gtk_entry_get_text(GTK_ENTRY(gray));
+    const gchar *ndGray  = gtk_entry_get_text(GTK_ENTRY(bin));
+    GString *ftValue;
+    GString *ndValue;
+
+    // Verification the string void
+    if ((strcmp(ftGray, "") != 0) && (strcmp(ndGray, "") != 0)){
+        ftValue = g_string_new(ftGray);
+        ndValue = g_string_new(ndGray);
+        GString *valueAux = g_string_new("");
+
+        gboolean ftFlag = TRUE;
+        gboolean ndFlag = TRUE;
+
+        gint64 decimal;
+        gint64 nddecimal;
+
+        // Verification the string valid
+        for (gint i = 0; i <= (ftValue->len) - 1; i++) {
+            // Compare chars the object string with '0' y '1'
+            if (!((ftValue->str[i] == '0') || ftValue->str[i] == '1')) {
+                ftFlag = FALSE;
+                break;
+            }
+        }
+        
+        // for (gint i = 0; i <= (ndValue->len) - 1; i++) {
+        //     // Compare chars the object string with '0' y '1'
+        //     if (!((ndValue->str[i] == '0') || ndValue->str[i] == '1')) {
+        //         ndFlag = FALSE;
+        //         break;
+        //     }
+        // }
+
+
+        // // Valid multipl the 4 to ftValue 
+        gint difference = 0;
+        // for (gint i = 4; i <= (ftValue->len + 4); i += 4) {
+        //     if (i >= (ftValue->len - 1)) {
+        //         difference = i - (ftValue->len);
+        //     }
+        // }
+
+        if ((ftValue->len % 4) != 0) {
+            ftFlag = FALSE;
+            puts("FALSO 1");
+        }
+
+        g_print("string: %s\n", ftValue->str); 
+        if (ftFlag == TRUE){
+            // Verification the format BCD valid
+            for (gint i = 4; i < (ftValue -> len) + 4; i += 4) {
+                // Save 4 bits 
+                valueAux = g_string_assign(valueAux, ftValue->str);
+                valueAux = g_string_erase (valueAux, i, - 1);
+                valueAux = g_string_erase (valueAux, 0, i - 4);
+                // g_print("desde: %d hasta: %d \n", i - 4, i); 
+                // g_print("erase: %s\n", valueAux->str); 
+
+                decimal = strtol(valueAux->str, NULL, 2);
+                // g_print("decimal: %ld\n", decimal); 
+                if(decimal > 9) {
+                    difference = i - (ftValue->len);
+                }
+                
+            }
+
+            if ((ftValue->len - 1) % 4 == 0) {
+                ftFlag = FALSE;
+            puts("FALSO 2");
+            }
+        }
+        
+        
+        // Valid multipl the 4 to ndValue 
+        // for (gint i = 4; i <= (ndValue->len + 4); i += 4) {
+        //     if (i >= (ndValue->len - 1)) {
+        //         ftFlag = FALSE;
+        //     }
+        // }
+            // g_print("string: %s\n", ndValue->str); 
+        if (ftFlag == TRUE){
+            // puts("entry +   ");
+            // Verification the format BCD valid
+            for (gint i = 4; i < (ndValue -> len) + 4; i += 4) {
+                // Save 4 bits 
+                valueAux = g_string_assign(valueAux, ndValue->str);
+                valueAux = g_string_erase (valueAux, i, - 1);
+                valueAux = g_string_erase (valueAux, 0, i - 4);
+                // g_print("desde: %d hasta: %d \n", i - 4, i); 
+
+                decimal = strtol(valueAux->str, NULL, 2);
+                // g_print("decimal: %ld\n", decimal); 
+                if(decimal > 9) {
+                    ndFlag = FALSE;
+                }
+                
+            }
+        }
+
+        // continue
+        if ((ftFlag == TRUE) && (ndFlag == TRUE)) {
+            
+            // somatory the 4 in 4
+            int ftLong = ftValue -> len; 
+            int ndLong = ndValue -> len;
+            int length;
+            if (ndLong >= ftLong) {
+                length = ndLong;
+            } else {
+                length = ftLong + 4;
+            }
+
+            gint suma;
+            char aux2;
+            GString *request = g_string_new("");
+            for (gint i = 4; i < length; i += 4) {
+                // Save 4 bits 
+                puts("entry ");
+                valueAux = g_string_assign(valueAux, ndValue->str);
+                valueAux = g_string_erase (valueAux, i, - 1);
+                valueAux = g_string_erase (valueAux, 0, i - 4);
+
+                decimal = g_ascii_strtoll(valueAux->str, NULL, 2);
+                
+                valueAux = g_string_assign(valueAux, ftValue->str);
+                valueAux = g_string_erase (valueAux, i + 4, - 1);
+                valueAux = g_string_erase (valueAux, 0, i);
+
+                nddecimal = g_ascii_strtoll(valueAux->str, NULL, 2);
+
+                suma = decimal + nddecimal;
+                aux2= sprintf(aux2, "%c", suma);
+                request = g_string_prepend(request, decToBin(suma, -1));
+                g_print("Decimal: %ld decimal 2: %ld resultado: %d - %s\n", decimal, nddecimal, suma, decToBin(suma, -1));
+            }
+            
+        } else {
+            showMessage(NULL, "Formato invalido", "Error");
+        }
+        
+        
+    } else {
+        showMessage(NULL, "Debe llenar todos los campos", "Advertencia");
+    }
+    
 }
 // Create inface for signal button 'SumarGray'
 static void sumaBcd(GtkWidget *widget, gpointer user_data){
@@ -720,13 +865,13 @@ static void sumaBcd(GtkWidget *widget, gpointer user_data){
 
     g_signal_connect(button, "clicked", G_CALLBACK(sumaryBCD), NULL);
 
-    label = gtk_label_new("Primer gray");
+    label = gtk_label_new("Primer bcd");
     gray = gtk_entry_new();
     bin = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(gray), "Formato Gray");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(gray), "Formato BCD");
     gtk_widget_set_size_request(GTK_WIDGET(gray), 230, 35);
     gtk_entry_set_alignment(GTK_ENTRY(gray), 0.5);
-    gtk_entry_set_placeholder_text(GTK_ENTRY(bin), "Formato Gray");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(bin), "Formato BCD");
     gtk_widget_set_size_request(GTK_WIDGET(bin), 230, 35);
     gtk_entry_set_alignment(GTK_ENTRY(bin), 0.5);
 
@@ -777,7 +922,7 @@ static void activate (GtkApplication *app, gpointer user_data) {
     // Create signals for buttons
     g_signal_connect(buttonConvert, "clicked", G_CALLBACK(convert), NULL);
     g_signal_connect(buttonHam, "clicked", G_CALLBACK(hamming), NULL);
-    g_signal_connect(buttonSuma, "clicked", G_CALLBACK(sumaBcd()), NULL);
+    g_signal_connect(buttonSuma, "clicked", G_CALLBACK(sumaBcd), NULL);
     g_signal_connect(buttonError, "clicked", G_CALLBACK(correctionHamming), NULL);
 
     // gtk_button_set_relief(GTK_BUTTON(buttonConvert), GTK_RELIEF_HALF);

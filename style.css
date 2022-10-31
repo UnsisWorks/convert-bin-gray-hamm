@@ -1,5 +1,5 @@
 #box {
-  background-image: linear-gradient(0deg, #256D7B, #181918 65%);
+  background-image: linear-gradient(0deg, #256D7B, #000000 65%);
 }
 /* .button {
   background: #00838f00;
@@ -9,7 +9,7 @@
 
 .button, .button-hamming, .button-error {
   font-size: 20px;
-  background-image: linear-gradient(0deg, #256D7B, #181918);
+  background-image: linear-gradient(0deg, #256D7B, #000000);
   color: whitesmoke;
   border: black;
   transition: all 1s;
